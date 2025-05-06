@@ -450,4 +450,17 @@
                 100% { transform: scale(1); }
             }
         
-   
+           
+            /* Style the dropdown icon */
+            .navbar-item i {
+                font-size: 0.75rem; /* Small size for the icon */
+                margin-right: 0.25rem; /* Space between icon and text */
+                vertical-align: middle; /* Align icon with text */
+            }
+        
+            /* Underline on hover for navbar item */
+            .navbar-item:hover {
+                text-decoration: underline;
+            }
+       
+        
