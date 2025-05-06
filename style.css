@@ -23,11 +23,11 @@
         }
         .hero-slide {
             opacity: 0;
-            animation: fadeOut 4s forwards ease-in-out; /* Slower transition */
+            animation: fadeOut 3s forwards ease-in-out; /* Slower transition */
         }
         .hero-slide.active {
             opacity: 1;
-            animation: fadeIn 4s forwards ease-in-out; /* Slower transition */
+            animation: fadeIn 3s forwards ease-in-out; /* Slower transition */
         }
         .nav-hover:hover .dropdown-menu {
             display: block;
