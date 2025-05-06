@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zira Artifacts Admin Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Toastify.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        }
+        .login-card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group input {
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+        }
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .toggle-password:hover {
+            color: #d97706;
+        }
+        .btn-primary {
+            background: #d97706;
+            transition: background 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #b45309;
+        }
+        @media (max-width: 640px) {
+            .login-card {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="login-card w-full max-w-md p-6">
+        <div class="flex items-center justify-center mb-6">
+            <img src="logo.png" alt="Zira Artifacts Logo" class="h-12 mr-2">
+            <h1 class="text-2xl font-bold text-gray-800">Zira Admin Login</h1>
+        </div>
+        <form id="login-form" class="space-y-4">
+            <div class="input-group">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" class="w-full border rounded px-3 py-2 mt-1 focus:outline-none" placeholder="admin@ziraartifacts.com" required aria-describedby="email-error">
+                <p id="email-error" class="text-red-600 text-sm mt-1 hidden">Please enter a valid email address.</p>
+            </div>
+            <div class="input-group">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" class="w-full border rounded px-3 py-2 mt-1 focus:outline-none" placeholder="••••••••" required aria-describedby="password-error">
+                <i class="fas fa-eye toggle-password" id="toggle-password" aria-label="Toggle password visibility"></i>
+                <p id="password-error" class="text-red-600 text-sm mt-1 hidden">Password is required.</p>
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" id="remember-me" class="mr-2">
+                    <span class="text-sm text-gray-600">Remember Me</span>
+                </label>
+                <a href="#" class="text-sm text-yellow-600 hover:underline">Forgot Password?</a>
+            </div>
+            <button type="submit" class="btn-primary w-full text-white px-4 py-2 rounded font-semibold">Login</button>
+        </form>
+        <p class="text-center text-sm text-gray-600 mt-4">
+            Don't have an account? <a href="#" class="text-yellow-600 hover:underline">Contact Support</a>
+        </p>
+    </div>
+
+    <script>
+        // Simulated Admin Credentials (Replace with backend API in production)
+        const ADMIN_CREDENTIALS = {
+            email: 'admin@ziraartifacts.com',
+            password: 'Admin123!'
+        };
+
+        // Form Elements
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const togglePassword = document.getElementById('toggle-password');
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                style: {
+                    background: type === 'success' ? '#d97706' : '#dc2626'
+                }
+            }).showToast();
+        }
+
+        // Password Toggle
+        togglePassword.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            togglePassword.classList.toggle('fa-eye', isPassword);
+            togglePassword.classList.toggle('fa-eye-slash', !isPassword);
+        });
+
+        // Form Validation
+        function validateForm() {
+            let isValid = true;
+            emailError.classList.add('hidden');
+            passwordError.classList.add('hidden');
+
+            if (!emailInput.value) {
+                emailError.textContent = 'Email is required.';
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                emailError.textContent = 'Please enter a valid email address.';
+                emailError.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!passwordInput.value) {
+                passwordError.textContent = 'Password is required.';
+                passwordError.classList.remove('hidden');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Simulated Authentication
+        function authenticate(email, password) {
+            return email.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password;
+        }
+
+        // Form Submission
+        loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                showToast('Please fix the errors in the form.', 'error');
+                return;
+            }
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            if (authenticate(email, password)) {
+                // Simulate session creation
+                localStorage.setItem('adminToken', 'mock-token-123');
+                showToast('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 1000);
+            } else {
+                showToast('Invalid email or password.', 'error');
+            }
+        });
+
+        // Handle Enter Key
+        loginForm.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && document.activeElement !== loginForm.querySelector('button')) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

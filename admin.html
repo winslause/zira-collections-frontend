@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zira Artifacts Admin Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Toastify.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .main-content {
+            transition: margin-left 0.3s ease;
+            width: 100%;
+            max-width: 1200px; /* Constrain content width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-left: auto;
+            margin-right: auto;
+            table-layout: auto; /* Allow columns to adjust dynamically */
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: normal; /* Allow text wrapping */
+            overflow-wrap: break-word; /* Break long words */
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .main-content {
+                margin-left: 16rem; /* Space for sidebar */
+            }
+        }
+        @media (max-width: 767px) {
+            .sidebar {
+                position: fixed;
+                z-index: 40;
+            }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .header-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .header-container input {
+                width: 100%;
+                max-width: 300px;
+            }
+            th, td {
+                padding: 0.5rem; /* Smaller padding on mobile */
+                font-size: 0.875rem; /* Smaller text */
+            }
+        }
+        @media (min-width: 1280px) {
+            .main-content {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+                width: calc(100% - 16rem); /* Account for sidebar */
+            }
+            .table-container {
+                overflow-x: visible; /* Disable horizontal scrolling */
+            }
+            table {
+                table-layout: auto; /* Ensure columns fit */
+            }
+            th, td {
+                padding: 0.5rem; /* Reduced padding to fit content */
+                font-size: 0.875rem; /* Slightly smaller text */
+                max-width: 200px; /* Cap column width */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 text-white flex flex-col z-40">
+        <div class="p-4 flex items-center space-x-2 border-b border-gray-700">
+            <img src="logo.png" alt="Zira Artifacts Logo" class="h-10">
+            <h1 class="text-xl font-bold">Zira Admin</h1>
+        </div>
+        <nav class="flex-1 p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="users">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="products">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="categories">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="discounts">
+                        <i class="fas fa-percent"></i>
+                        <span>Discounts</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="artisans">
+                        <i class="fas fa-user-check"></i>
+                        <span>Artisan Sellers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="stories">
+                        <i class="fas fa-book"></i>
+                        <span>Stories</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="reviews">
+                        <i class="fas fa-star"></i>
+                        <span>Reviews</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link flex items-center space-x-2 p-2 rounded hover:bg-yellow-600" data-section="passwords">
+                        <i class="fas fa-lock"></i>
+                        <span>Password Management</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-gray-700">
+            <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-red-600" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content p-4 sm:p-6 min-h-screen">
+        <!-- Header -->
+        <header class="header-container flex flex-col md:flex-row items-center justify-between mb-6">
+            <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-start">
+                <button id="toggle-sidebar" class="md:hidden text-gray-600">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <h2 class="text-2xl font-semibold text-gray-800" id="section-title">Dashboard</h2>
+            </div>
+            <div class="flex items-center space-x-4 w-full md:w-auto">
+                <input type="text" id="global-search" placeholder="Search..." class="border rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-yellow-600 w-full max-w-xs">
+                <i class="fas fa-user-circle text-2xl text-gray-600"></i>
+            </div>
+        </header>
+
+        <!-- Sections -->
+        <section id="dashboard" class="section">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 max-w-full mx-auto">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800">Total Sales</h3>
+                    <p class="text-2xl font-bold text-yellow-600">KSh 1,234,567</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800">New Users</h3>
+                    <p class="text-2xl font-bold text-yellow-600">245</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800">Pending Orders</h3>
+                    <p class="text-2xl font-bold text-yellow-600">32</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800">Top Product</h3>
+                    <p class="text-2xl font-bold text-yellow-600">Soap Dish</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-full mx-auto">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Sales Over Time</h3>
+                    <canvas id="sales-chart"></canvas>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">User Growth</h3>
+                    <canvas id="users-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="users" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Users</h3>
+                <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mt-2 sm:mt-0" onclick="openModal('user-modal')">Add User</button>
+            </div>
+            <input type="text" id="users-search" placeholder="Search users..." class="w-full max-w-md border rounded px-3 py-2 mb-4 mx-auto">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="products" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Products</h3>
+                <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mt-2 sm:mt-0" onclick="openModal('product-modal')">Add Product</button>
+            </div>
+            <input type="text" id="products-search" placeholder="Search products..." class="w-full max-w-md border rounded px-3 py-2 mb-4 mx-auto">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Discount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="orders" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Orders</h3>
+                <input type="text" id="orders-search" placeholder="Search orders..." class="w-full max-w-md border rounded px-3 py-2 mt-2 sm:mt-0">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="categories" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Categories</h3>
+                <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mt-2 sm:mt-0" onclick="openModal('category-modal')">Add Category</button>
+            </div>
+            <input type="text" id="categories-search" placeholder="Search categories..." class="w-full max-w-md border rounded px-3 py-2 mb-4 mx-auto">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categories-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="discounts" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Discounts</h3>
+                <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mt-2 sm:mt-0" onclick="openModal('discount-modal')">Add Discount</button>
+            </div>
+            <input type="text" id="discounts-search" placeholder="Search discounts..." class="w-full max-w-md border rounded px-3 py-2 mb-4 mx-auto">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Discount (%)</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="discounts-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="artisans" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Artisan Sellers</h3>
+                <input type="text" id="artisans-search" placeholder="Search artisans..." class="w-full max-w-md border rounded px-3 py-2 mt-2 sm:mt-0">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artisans-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="stories" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Stories</h3>
+                <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mt-2 sm:mt-0" onclick="openModal('story-modal')">Add Story</button>
+            </div>
+            <input type="text" id="stories-search" placeholder="Search stories..." class="w-full max-w-md border rounded px-3 py-2 mb-4 mx-auto">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Published</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stories-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="reviews" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Manage Reviews</h3>
+                <input type="text" id="reviews-search" placeholder="Search reviews..." class="w-full max-w-md border rounded px-3 py-2 mt-2 sm:mt-0">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviews-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="passwords" class="section hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 max-w-full mx-auto">
+                <h3 class="text-xl font-semibold">Password Management</h3>
+                <input type="text" id="passwords-search" placeholder="Search users..." class="w-full max-w-md border rounded px-3 py-2 mt-2 sm:mt-0">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="passwords-table"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4" id="user-modal-title">Add User</h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" id="user-name" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="user-email" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Role</label>
+                    <select id="user-role" class="w-full border rounded px-3 py-2" required>
+                        <option value="buyer">Buyer</option>
+                        <option value="artisan">Artisan Seller</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('user-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4" id="product-modal-title">Add Product</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" id="product-name" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                    <select id="product-category" class="w-full border rounded px-3 py-2" required></select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Price (KSh)</label>
+                    <input type="number" id="product-price" class="w-full border rounded px-3 py-2" step="0.01" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Image URL</label>
+                    <input type="url" id="product-image" class="w-full border rounded px-3 py-2">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('product-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4" id="category-modal-title">Add Category</h2>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" id="category-name" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('category-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div id="discount-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4" id="discount-modal-title">Add Discount</h2>
+            <form id="discount-form">
+                <input type="hidden" id="discount-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Product</label>
+                    <select id="discount-product" class="w-full border rounded px-3 py-2" required></select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Discount (%)</label>
+                    <input type="number" id="discount-percent" class="w-full border rounded px-3 py-2" min="0" max="100" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="date" id="discount-start" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">End Date</label>
+                    <input type="date" id="discount-end" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('discount-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Story Modal -->
+    <div id="story-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4" id="story-modal-title">Add Story</h2>
+            <form id="story-form">
+                <input type="hidden" id="story-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Title</label>
+                    <input type="text" id="story-title" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Content</label>
+                    <textarea id="story-content" class="w-full border rounded px-3 py-2" rows="5" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Image URL</label>
+                    <input type="url" id="story-image" class="w-full border rounded px-3 py-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Published</label>
+                    <input type="checkbox" id="story-published">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('story-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Simulated Data (Replace with API calls in production)
+        let users = [
+            { id: 1, name: 'Amina K.', email: 'amina@example.com', role: 'buyer' },
+            { id: 2, name: 'Jean-Luc M.', email: 'jeanluc@example.com', role: 'artisan' },
+            { id: 3, name: 'Admin User', email: 'admin@example.com', role: 'admin' }
+        ];
+        let products = [
+            { id: 1, name: 'Soap Dish', category: 'Stone Carvings', price: 1200.99, discount: 20, image: 'https://tacc.co.ke/wp-content/uploads/2024/06/ESOPDS1358_Grey_2-470x470.jpg' },
+            { id: 2, name: 'Mortar & Pestle', category: 'Stone Carvings', price: 2324.99, discount: 18, image: 'https://tibaquipafrica.com/wp-content/uploads/2024/04/mortar-and-pestle.png' }
+        ];
+        let orders = [
+            { id: 'ORD001', customer: 'Amina K.', total: 1500.00, status: 'Pending' },
+            { id: 'ORD002', customer: 'Jean-Luc M.', total: 2800.00, status: 'Shipped' }
+        ];
+        let categories = [
+            { id: 1, name: 'Stone Carvings' },
+            { id: 2, name: 'Cultural Artifacts' }
+        ];
+        let discounts = [
+            { id: 1, productId: 1, productName: 'Soap Dish', percent: 20, startDate: '2025-05-01', endDate: '2025-06-01' },
+            { id: 2, productId: 2, productName: 'Mortar & Pestle', percent: 18, startDate: '2025-05-01', endDate: '2025-06-01' }
+        ];
+        let artisans = [
+            { id: 1, name: 'Jean-Luc M.', email: 'jeanluc@example.com', status: 'Approved' },
+            { id: 2, name: 'Fatou N.', email: 'fatou@example.com', status: 'Pending' }
+        ];
+        let stories = [
+            { id: 1, title: 'Easter Getaway Essentials', content: 'As Easter approaches...', image: 'craft.jpg', published: true },
+            { id: 2, title: 'African Textiles in Design', content: 'How Traditional African Fabrics...', image: 'craftt.jpg', published: false }
+        ];
+        let reviews = [
+            { id: 1, product: 'Soap Dish', customer: 'Amina K.', rating: 5, comment: 'Amazing quality!', status: 'Approved' },
+            { id: 2, product: 'Mortar & Pestle', customer: 'Jean-Luc M.', rating: 4, comment: 'Very nice!', status: 'Pending' }
+        ];
+
+        // Logout Function (Optional, no redirect)
+        function logout() {
+            localStorage.removeItem('adminToken');
+            showToast('Logged out successfully');
+            // Optionally redirect if needed: window.location.href = 'admin-login.html';
+        }
+
+        // Initialize Dashboard Charts
+        const salesChart = new Chart(document.getElementById('sales-chart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'Sales (KSh)',
+                    data: [50000, 75000, 100000, 90000, 123456],
+                    borderColor: '#d97706',
+                    fill: false
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const usersChart = new Chart(document.getElementById('users-chart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [50, 75, 100, 90, 245],
+                    backgroundColor: '#d97706'
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const section = link.dataset.section;
+                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+                document.getElementById(section).classList.remove('hidden');
+                document.getElementById('section-title').textContent = section.charAt(0).toUpperCase() + section.slice(1);
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('bg-yellow-600'));
+                link.classList.add('bg-yellow-600');
+                if (window.innerWidth < 768) {
+                    document.querySelector('.sidebar').classList.add('sidebar-hidden');
+                }
+            });
+        });
+
+        // Sidebar Toggle
+        document.getElementById('toggle-sidebar').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('sidebar-hidden');
+        });
+
+        // Modal Functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('show');
+            if (modalId === 'product-modal') {
+                populateProductCategories();
+            } else if (modalId === 'discount-modal') {
+                populateDiscountProducts();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            resetForm(modalId);
+        }
+
+        function resetForm(modalId) {
+            const form = document.getElementById(modalId.replace('modal', 'form'));
+            form.reset();
+            form.querySelector('input[type="hidden"]').value = '';
+            document.getElementById(modalId + '-title').textContent = `Add ${modalId.split('-')[0].charAt(0).toUpperCase() + modalId.split('-')[0].slice(1)}`;
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                style: {
+                    background: type === 'success' ? '#d97706' : '#dc2626'
+                }
+            }).showToast();
+        }
+
+        // Populate Tables
+        function populateUsers() {
+            const tbody = document.getElementById('users-table');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="editUser(${user.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateProducts() {
+            const tbody = document.getElementById('products-table');
+            tbody.innerHTML = '';
+            products.forEach(product => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>KSh ${product.price.toFixed(2)}</td>
+                        <td>${product.discount ? product.discount + '%' : 'None'}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="editProduct(${product.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteProduct(${product.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateOrders() {
+            const tbody = document.getElementById('orders-table');
+            tbody.innerHTML = '';
+            orders.forEach(order => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${order.id}</td>
+                        <td>${order.customer}</td>
+                        <td>KSh ${order.total.toFixed(2)}</td>
+                        <td>
+                            <select onchange="updateOrderStatus('${order.id}', this.value)">
+                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="viewOrder('${order.id}')"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateCategories() {
+            const tbody = document.getElementById('categories-table');
+            tbody.innerHTML = '';
+            categories.forEach(category => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${category.id}</td>
+                        <td>${category.name}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="editCategory(${category.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteCategory(${category.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateDiscounts() {
+            const tbody = document.getElementById('discounts-table');
+            tbody.innerHTML = '';
+            discounts.forEach(discount => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${discount.id}</td>
+                        <td>${discount.productName}</td>
+                        <td>${discount.percent}%</td>
+                        <td>${discount.startDate}</td>
+                        <td>${discount.endDate}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="editDiscount(${discount.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteDiscount(${discount.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateArtisans() {
+            const tbody = document.getElementById('artisans-table');
+            tbody.innerHTML = '';
+            artisans.forEach(artisan => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${artisan.id}</td>
+                        <td>${artisan.name}</td>
+                        <td>${artisan.email}</td>
+                        <td>
+                            <select onchange="updateArtisanStatus(${artisan.id}, this.value)">
+                                <option value="Approved" ${artisan.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                                <option value="Pending" ${artisan.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Suspended" ${artisan.status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="viewArtisan(${artisan.id})"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateStories() {
+            const tbody = document.getElementById('stories-table');
+            tbody.innerHTML = '';
+            stories.forEach(story => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${story.id}</td>
+                        <td>${story.title}</td>
+                        <td>${story.published ? 'Yes' : 'No'}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="editStory(${story.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteStory(${story.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateReviews() {
+            const tbody = document.getElementById('reviews-table');
+            tbody.innerHTML = '';
+            reviews.forEach(review => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${review.id}</td>
+                        <td>${review.product}</td>
+                        <td>${review.customer}</td>
+                        <td>${review.rating} ★</td>
+                        <td>
+                            <select onchange="updateReviewStatus(${review.id}, this.value)">
+                                <option value="Approved" ${review.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                                <option value="Pending" ${review.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Rejected" ${review.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="viewReview(${review.id})"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn text-red-600 hover:text-red-800" onclick="deleteReview(${review.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populatePasswords() {
+            const tbody = document.getElementById('passwords-table');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <button class="action-btn text-blue-600 hover:text-blue-800" onclick="resetPassword(${user.id})"><i class="fas fa-key"></i> Reset</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Form Handlers
+        document.getElementById('user-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('user-id').value;
+            const user = {
+                id: id ? parseInt(id) : users.length + 1,
+                name: document.getElementById('user-name').value,
+                email: document.getElementById('user-email').value,
+                role: document.getElementById('user-role').value
+            };
+            if (id) {
+                users = users.map(u => u.id === user.id ? user : u);
+                showToast('User updated successfully');
+            } else {
+                users.push(user);
+                showToast('User added successfully');
+            }
+            populateUsers();
+            closeModal('user-modal');
+        });
+
+        document.getElementById('product-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('product-id').value;
+            const product = {
+                id: id ? parseInt(id) : products.length + 1,
+                name: document.getElementById('product-name').value,
+                category: document.getElementById('product-category').value,
+                price: parseFloat(document.getElementById('product-price').value),
+                image: document.getElementById('product-image').value,
+                discount: 0
+            };
+            if (id) {
+                products = products.map(p => p.id === product.id ? product : p);
+                showToast('Product updated successfully');
+            } else {
+                products.push(product);
+                showToast('Product added successfully');
+            }
+            populateProducts();
+            closeModal('product-modal');
+        });
+
+        document.getElementById('category-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('category-id').value;
+            const category = {
+                id: id ? parseInt(id) : categories.length + 1,
+                name: document.getElementById('category-name').value
+            };
+            if (id) {
+                categories = categories.map(c => c.id === category.id ? category : c);
+                showToast('Category updated successfully');
+            } else {
+                categories.push(category);
+                showToast('Category added successfully');
+            }
+            populateCategories();
+            closeModal('category-modal');
+        });
+
+        document.getElementById('discount-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('discount-id').value;
+            const productId = parseInt(document.getElementById('discount-product').value);
+            const discount = {
+                id: id ? parseInt(id) : discounts.length + 1,
+                productId,
+                productName: products.find(p => p.id === productId).name,
+                percent: parseInt(document.getElementById('discount-percent').value),
+                startDate: document.getElementById('discount-start').value,
+                endDate: document.getElementById('discount-end').value
+            };
+            if (id) {
+                discounts = discounts.map(d => d.id === discount.id ? discount : d);
+                showToast('Discount updated successfully');
+            } else {
+                discounts.push(discount);
+                showToast('Discount added successfully');
+            }
+            products = products.map(p => p.id === productId ? { ...p, discount: discount.percent } : p);
+            populateDiscounts();
+            populateProducts();
+            closeModal('discount-modal');
+        });
+
+        document.getElementById('story-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = document.getElementById('story-id').value;
+            const story = {
+                id: id ? parseInt(id) : stories.length + 1,
+                title: document.getElementById('story-title').value,
+                content: document.getElementById('story-content').value,
+                image: document.getElementById('story-image').value,
+                published: document.getElementById('story-published').checked
+            };
+            if (id) {
+                stories = stories.map(s => s.id === story.id ? story : s);
+                showToast('Story updated successfully');
+            } else {
+                stories.push(story);
+                showToast('Story added successfully');
+            }
+            populateStories();
+            closeModal('story-modal');
+        });
+
+        // Edit/Delete Functions
+        function editUser(id) {
+            const user = users.find(u => u.id === id);
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-name').value = user.name;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-modal-title').textContent = 'Edit User';
+            openModal('user-modal');
+        }
+
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                users = users.filter(u => u.id !== id);
+                populateUsers();
+                showToast('User deleted successfully');
+            }
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-category').value = product.category;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-image').value = product.image;
+            document.getElementById('product-modal-title').textContent = 'Edit Product';
+            openModal('product-modal');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                products = products.filter(p => p.id !== id);
+                discounts = discounts.filter(d => d.productId !== id);
+                populateProducts();
+                populateDiscounts();
+                showToast('Product deleted successfully');
+            }
+        }
+
+        function editCategory(id) {
+            const category = categories.find(c => c.id === id);
+            document.getElementById('category-id').value = category.id;
+            document.getElementById('category-name').value = category.name;
+            document.getElementById('category-modal-title').textContent = 'Edit Category';
+            openModal('category-modal');
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                categories = categories.filter(c => c.id !== id);
+                populateCategories();
+                showToast('Category deleted successfully');
+            }
+        }
+
+        function editDiscount(id) {
+            const discount = discounts.find(d => d.id === id);
+            document.getElementById('discount-id').value = discount.id;
+            document.getElementById('discount-product').value = discount.productId;
+            document.getElementById('discount-percent').value = discount.percent;
+            document.getElementById('discount-start').value = discount.startDate;
+            document.getElementById('discount-end').value = discount.endDate;
+            document.getElementById('discount-modal-title').textContent = 'Edit Discount';
+            openModal('discount-modal');
+        }
+
+        function deleteDiscount(id) {
+            if (confirm('Are you sure you want to delete this discount?')) {
+                const discount = discounts.find(d => d.id === id);
+                products = products.map(p => p.id === discount.productId ? { ...p, discount: 0 } : p);
+                discounts = discounts.filter(d => d.id !== id);
+                populateDiscounts();
+                populateProducts();
+                showToast('Discount deleted successfully');
+            }
+        }
+
+        function editStory(id) {
+            const story = stories.find(s => s.id === id);
+            document.getElementById('story-id').value = story.id;
+            document.getElementById('story-title').value = story.title;
+            document.getElementById('story-content').value = story.content;
+            document.getElementById('story-image').value = story.image;
+            document.getElementById('story-published').checked = story.published;
+            document.getElementById('story-modal-title').textContent = 'Edit Story';
+            openModal('story-modal');
+        }
+
+        function deleteStory(id) {
+            if (confirm('Are you sure you want to delete this story?')) {
+                stories = stories.filter(s => s.id !== id);
+                populateStories();
+                showToast('Story deleted successfully');
+            }
+        }
+
+        function updateOrderStatus(orderId, status) {
+            orders = orders.map(o => o.id === orderId ? { ...o, status } : o);
+            populateOrders();
+            showToast('Order status updated');
+        }
+
+        function viewOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            alert(`Order Details:\nID: ${order.id}\nCustomer: ${order.customer}\nTotal: KSh ${order.total}\nStatus: ${order.status}`);
+        }
+
+        function updateArtisanStatus(id, status) {
+            artisans = artisans.map(a => a.id === id ? { ...a, status } : a);
+            populateArtisans();
+            showToast('Artisan status updated');
+        }
+
+        function viewArtisan(id) {
+            const artisan = artisans.find(a => a.id === id);
+            alert(`Artisan Details:\nID: ${artisan.id}\nName: ${artisan.name}\nEmail: ${artisan.email}\nStatus: ${artisan.status}`);
+        }
+
+        function updateReviewStatus(id, status) {
+            reviews = reviews.map(r => r.id === id ? { ...r, status } : r);
+            populateReviews();
+            showToast('Review status updated');
+        }
+
+        function viewReview(id) {
+            const review = reviews.find(r => r.id === id);
+            alert(`Review Details:\nID: ${review.id}\nProduct: ${review.product}\nCustomer: ${review.customer}\nRating: ${review.rating} ★\nComment: ${review.comment}\nStatus: ${review.status}`);
+        }
+
+        function deleteReview(id) {
+            if (confirm('Are you sure you want to delete this review?')) {
+                reviews = reviews.filter(r => r.id !== id);
+                populateReviews();
+                showToast('Review deleted successfully');
+            }
+        }
+
+        function resetPassword(id) {
+            if (confirm('Are you sure you want to reset this user\'s password?')) {
+                showToast(`Password reset email sent to user ${id}`);
+            }
+        }
+
+        // Search Filters
+        function setupSearch(id, data, tableFn) {
+            document.getElementById(id).addEventListener('input', e => {
+                const query = e.target.value.toLowerCase();
+                const filtered = data.filter(item => Object.values(item).some(val => val.toString().toLowerCase().includes(query)));
+                data = filtered;
+                tableFn();
+                data = [...data]; // Restore original data
+            });
+        }
+
+        setupSearch('users-search', users, populateUsers);
+        setupSearch('products-search', products, populateProducts);
+        setupSearch('orders-search', orders, populateOrders);
+        setupSearch('categories-search', categories, populateCategories);
+        setupSearch('discounts-search', discounts, populateDiscounts);
+        setupSearch('artisans-search', artisans, populateArtisans);
+        setupSearch('stories-search', stories, populateStories);
+        setupSearch('reviews-search', reviews, populateReviews);
+        setupSearch('passwords-search', users, populatePasswords);
+
+        // Populate Dropdowns
+        function populateProductCategories() {
+            const select = document.getElementById('product-category');
+            select.innerHTML = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        }
+
+        function populateDiscountProducts() {
+            const select = document.getElementById('discount-product');
+            select.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        }
+
+        // Initialize
+        populateUsers();
+        populateProducts();
+        populateOrders();
+        populateCategories();
+        populateDiscounts();
+        populateArtisans();
+        populateStories();
+        populateReviews();
+        populatePasswords();
+    </script>
+</body>
+</html>

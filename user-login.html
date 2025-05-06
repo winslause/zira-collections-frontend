@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zira Artifacts - User Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Toastify.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .main-content {
+            width: 100%;
+            max-width: 1200px; /* Constrain content width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal.show {
+            display: flex;
+        }
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .main-content {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .hero-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            .hero-section button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        @media (min-width: 1280px) {
+            .main-content {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+                overflow-x: visible; /* No horizontal scrolling */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Main Content -->
+    <main class="main-content p-4 sm:p-6 min-h-screen">
+        <!-- Header -->
+        <header class="flex items-center space-x-4 mb-8">
+            <img src="logo.png" alt="Zira Artifacts Logo" class="h-12">
+            <h1 class="text-3xl font-bold text-gray-800">Zira Artifacts</h1>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section flex flex-col md:flex-row items-center justify-between bg-white rounded-lg shadow-lg p-8 max-w-full mx-auto">
+            <div class="md:w-1/2 mb-6 md:mb-0">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Welcome to Zira Artifacts</h2>
+                <p class="text-gray-600 mb-6">Discover unique stone carvings and cultural artifacts. Sign in or create an account to start shopping or selling!</p>
+                <div class="flex space-x-4">
+                    <button class="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700" onclick="openModal('login-modal')">Sign In</button>
+                    <button class="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400" onclick="openModal('register-modal')">Sign Up</button>
+                </div>
+            </div>
+            <div class="md:w-1/2">
+                <img src="https://tacc.co.ke/wp-content/uploads/2024/06/ESOPDS1358_Grey_2-470x470.jpg" alt="Featured Artifact" class="w-full h-auto rounded-lg">
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-modal-title" aria-modal="true">
+        <div class="modal-content">
+            <h2 id="login-modal-title" class="text-xl font-semibold mb-4">Sign In</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="login-email">Email</label>
+                    <input type="email" id="login-email" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="login-password">Password</label>
+                    <input type="password" id="login-password" class="w-full border rounded px-3 py-2" required minlength="6">
+                </div>
+                <div class="mb-4">
+                    <a href="#" class="text-yellow-600 hover:underline text-sm" onclick="closeModal('login-modal'); openModal('reset-password-modal')">Forgot Password?</a>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('login-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Sign In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-modal-title" aria-modal="true">
+        <div class="modal-content">
+            <h2 id="register-modal-title" class="text-xl font-semibold mb-4">Sign Up</h2>
+            <form id="register-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="register-name">Name</label>
+                    <input type="text" id="register-name" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="register-email">Email</label>
+                    <input type="email" id="register-email" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="register-password">Password</label>
+                    <input type="password" id="register-password" class="w-full border rounded px-3 py-2" required minlength="6">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="register-role">Role</label>
+                    <select id="register-role" class="w-full border rounded px-3 py-2" required>
+                        <option value="buyer">Buyer</option>
+                        <option value="artisan">Artisan Seller</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('register-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="reset-password-modal" class="modal" role="dialog" aria-labelledby="reset-password-modal-title" aria-modal="true">
+        <div class="modal-content">
+            <h2 id="reset-password-modal-title" class="text-xl font-semibold mb-4">Reset Password</h2>
+            <form id="reset-password-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700" for="reset-email">Email</label>
+                    <input type="email" id="reset-email" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onclick="closeModal('reset-password-modal')">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Send Reset Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Simulated User Data in localStorage
+        if (!localStorage.getItem('users')) {
+            const initialUsers = [
+                { id: 1, name: 'Amina K.', email: 'amina@example.com', password: 'password123', role: 'buyer' },
+                { id: 2, name: 'Jean-Luc M.', email: 'jeanluc@example.com', password: 'password123', role: 'artisan' }
+            ];
+            localStorage.setItem('users', JSON.stringify(initialUsers));
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            document.getElementById(modalId).querySelector('input').focus();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            const form = document.getElementById(modalId.replace('modal', 'form'));
+            form.reset();
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                style: {
+                    background: type === 'success' ? '#d97706' : '#dc2626'
+                }
+            }).showToast();
+        }
+
+        // Form Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Login Form Handler
+        document.getElementById('login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!validateEmail(email)) {
+                showToast('Please enter a valid email', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                localStorage.setItem('userToken', btoa(JSON.stringify({ email, role: user.role })));
+                showToast('Logged in successfully');
+                closeModal('login-modal');
+                // Redirect to dashboard or homepage (uncomment when ready)
+                // window.location.href = 'user-dashboard.html';
+            } else {
+                showToast('Invalid email or password', 'error');
+            }
+        });
+
+        // Registration Form Handler
+        document.getElementById('register-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const role = document.getElementById('register-role').value;
+
+            if (!validateEmail(email)) {
+                showToast('Please enter a valid email', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.some(u => u.email === email)) {
+                showToast('Email already registered', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: users.length + 1,
+                name,
+                email,
+                password, // In production, hash passwords
+                role
+            };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            showToast('Registration successful! Please sign in.');
+            closeModal('register-modal');
+            openModal('login-modal');
+        });
+
+        // Reset Password Form Handler
+        document.getElementById('reset-password-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+
+            if (!validateEmail(email)) {
+                showToast('Please enter a valid email', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            if (!users.some(u => u.email === email)) {
+                showToast('Email not found', 'error');
+                return;
+            }
+
+            showToast('Password reset link sent to your email');
+            closeModal('reset-password-modal');
+        });
+
+        // Close Modal on Escape Key
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    closeModal(modal.id);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
