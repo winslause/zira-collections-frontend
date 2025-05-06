@@ -606,6 +606,51 @@
         50% { transform: scale(1.03); }
         100% { transform: scale(1); }
     }
+
+    /* New Responsive Styles for Smaller Devices with !important */
+    @media (max-width: 768px) {
+        #shopByCategory .flex {
+            gap: 1rem !important; /* Reduce gap for smaller screens */
+        }
+
+        #shopByCategory .w-64 {
+            width: calc(50% - 0.5rem) !important; /* Two items per row with adjusted gap */
+        }
+
+        #shopByCategory .w-48 {
+            width: 100% !important; /* Make the image container take full width of the parent */
+            max-width: 150px !important; /* Slightly reduce max width for better fit */
+            height: auto !important; /* Maintain aspect ratio */
+            aspect-ratio: 1 / 1 !important; /* Ensure the image container remains a circle */
+        }
+    }
+
+    @media (max-width: 480px) {
+        #shopByCategory .flex {
+            gap: 0.5rem !important; /* Further reduce gap for very small screens */
+        }
+
+        #shopByCategory .w-64 {
+            width: calc(50% - 0.25rem) !important; /* Adjust for very small screens */
+        }
+
+        #shopByCategory .w-48 {
+            max-width: 120px !important; /* Further reduce max width for very small screens */
+        }
+    }
+</style>
+
+<!-- Scoped Animation -->
+<style>
+    #shopByCategory .animate-pulse-category {
+        animation: pulse-category 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse-category {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
 </style>
 
 <!-- Featured This Month -->
