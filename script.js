@@ -56,7 +56,7 @@ $(document).ready(function() {
 function showTab(tabId) {
     const tabs = document.querySelectorAll('#featured-this-month .ftm-tab');
     const contents = document.querySelectorAll('#featured-this-month .ftm-tab-content');
-    tabs.forEach(tab => tab.class RainerClass('active'));
+    tabs.forEach(tab => tab.classList.remove('active'));
     contents.forEach(content => content.classList.remove('active'));
     document.querySelector(`#featured-this-month .ftm-tab[onclick="showTab('${tabId}')"]`).classList.add('active');
     document.querySelector(`#tab-${tabId}`).classList.add('active');
@@ -125,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function handlePrevClick() {
         if (isTransitioning) return;
         try {
-            stopAutoSlide(); // Stop auto-slide before manual update
             if (window.innerWidth >= 768) {
                 if (currentSlideLarge > 0) {
                     currentSlideLarge--;
@@ -137,7 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateSlider();
                 }
             }
-            startAutoSlide(); // Restart auto-slide
+            stopAutoSlide();
+            startAutoSlide();
         } catch (e) {
             console.error('Error in prev button:', e);
         }
@@ -146,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleNextClick() {
         if (isTransitioning) return;
         try {
-            stopAutoSlide(); // Stop auto-slide before manual update
             if (window.innerWidth >= 768) {
                 if (currentSlideLarge < totalSlidesLarge - 1) {
                     currentSlideLarge++;
@@ -158,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateSlider();
                 }
             }
-            startAutoSlide(); // Restart auto-slide
+            stopAutoSlide();
+            startAutoSlide();
         } catch (e) {
             console.error('Error in next button:', e);
         }
