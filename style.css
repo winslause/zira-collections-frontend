@@ -498,4 +498,82 @@
                 opacity: 0.15; /* Optional: soften background */
                 z-index: 0;
               }
-              
+              /* Navbar */
+.navbar {
+    top: 0; /* Default for mobile */
+    z-index: 50; /* Increased to ensure navbar is above other elements */
+}
+
+/* Top Layer Adjustments for Desktop */
+.top-layer {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 60; /* Higher than navbar to appear above it */
+}
+@media (min-width: 768px) {
+    .navbar {
+        top: 36px; /* Height of the top layer */
+    }
+}
+
+/* Customer Reviews Section */
+#zira-customer-reviews {
+    position: relative;
+    z-index: 10; /* Ensure the section is above background elements */
+}
+#zira-customer-reviews::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('../images/curve7.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    z-index: -1; /* Explicitly behind content */
+}
+
+/* Review Slider Buttons */
+#prevReview,
+#nextReview {
+    position: relative;
+    z-index: 20; /* Ensure buttons are clickable */
+    transition: all 0.3s ease;
+}
+#prevReview:disabled,
+#nextReview:disabled {
+    background-color: #e5e7eb; /* Gray-200 */
+    color: #9ca3af; /* Gray-400 */
+    cursor: not-allowed;
+}
+
+/* Review Slider Containers */
+#reviewSliderLarge,
+#reviewSliderSmall {
+    position: relative;
+    z-index: 15; /* Above the ::before pseudo-element */
+}
+#reviewSliderLargeInner,
+#reviewSliderSmallInner {
+    display: flex;
+    transition: transform 0.7s ease-in-out;
+}
+
+/* Hero Slider */
+#hero-slider {
+    background-color: #000;
+    z-index: 5; /* Lower than navbar and review section */
+}
+
+/* Floating Buttons */
+.floating-btn-container {
+    z-index: 30; /* High, but below navbar and top layer */
+}
+
+/* Ensure no pointer-events block clicks */
+.navbar-item,
+#prevReview,
+#nextReview {
+    pointer-events: auto; /* Explicitly allow clicks */
+}
